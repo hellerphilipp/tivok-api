@@ -15,7 +15,7 @@ let package = Package(
     targets: [
         .target(
             name: "tivok-api",
-            dependencies: []),
+			dependencies: ["Vapor"]),
         .testTarget(
             name: "tivok-apiTests",
             dependencies: ["tivok-api"]),
