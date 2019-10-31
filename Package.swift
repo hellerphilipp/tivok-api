@@ -10,6 +10,7 @@ let package = Package(
             targets: ["tivok-api"]),
     ],
     dependencies: [
+		.package(url: "https://github.com/vapor/vapor.git", from: "3.3.1"),
     ],
     targets: [
         .target(
