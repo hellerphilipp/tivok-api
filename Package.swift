@@ -17,8 +17,5 @@ let package = Package(
         .target(
             name: "tivok-api",
 			dependencies: ["Vapor", "FluentPostgreSQL"]),
-        .testTarget(
-            name: "tivok-apiTests",
-            dependencies: ["tivok-api"]),
     ]
 )
