@@ -9,6 +9,7 @@ private func app(_ env: Environment) throws -> Application {
 	
 	// Router configuration
 	let router = EngineRouter.default()
+	try routes(router)
 	services.register(router, as: Router.self)
 	
 	// Database configuration
@@ -19,9 +20,13 @@ private func app(_ env: Environment) throws -> Application {
 		database: try EnvLoader.get("DB_DATABASE"),
 		password: try EnvLoader.get("DB_PASSWORD")
 	)
-	try services.register(PostgreSQLProvider())
+	try services.register(FluentPostgreSQLProvider())
 	services.register(dbConfig)
 	
+	// Register database migrations
+	var migrations = MigrationConfig()
+	migrations.add(model: User.self, database: .psql)
+	services.register(migrations)
 	
 	return try Application(config: config, environment: env, services: services)
 }
