@@ -6,3 +6,4 @@ xcuserdata
 *.xcodeproj
 DerivedData/
 .DS_Store
+.env
