@@ -11,11 +11,12 @@ let package = Package(
     ],
     dependencies: [
 		.package(url: "https://github.com/vapor/vapor.git", from: "3.3.1"),
+		.package(url: "https://github.com/vapor/fluent-postgresql.git", from: "1.0.0"),
     ],
     targets: [
         .target(
             name: "tivok-api",
-			dependencies: ["Vapor"]),
+			dependencies: ["Vapor", "FluentPostgreSQL"]),
         .testTarget(
             name: "tivok-apiTests",
             dependencies: ["tivok-api"]),
