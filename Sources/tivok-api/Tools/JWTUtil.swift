@@ -9,7 +9,7 @@ import JWT
 
 public class JWTUtil {
 	/// Verifies JWK-signed OpenID compliant JWTs
-	public func verify(_ token: String) throws {
+	public func verify(_ token: String) throws -> String {
 		let payload = try JSONDecoder().decode(
 			Auth0Payload.self,
 			from: decodeBase64(token.components(separatedBy: ".")[1], encoding: .ascii)
@@ -21,7 +21,7 @@ public class JWTUtil {
 		
 		let jwt = try JWT<Auth0Payload>(from: token, verifiedUsing: .init(jwks: jwks))
 		
-		print(jwt.payload.sub)
+		return jwt.payload.sub
 	}
 	
 	private func decodeBase64(_ encoded: String, encoding: String.Encoding) throws -> String {
