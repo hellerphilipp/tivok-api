@@ -10,13 +10,13 @@ import FluentPostgreSQL
 
 final class User: Content {
 	var id: UUID?
-	var email: String
+	var sub: String
 	var firstname: String
 	var lastname: String
 	
-	init(id: UUID? = nil, email: String, firstname: String, lastname: String) {
+	init(id: UUID? = nil, sub: String, firstname: String, lastname: String) {
 		self.id = id
-		self.email = email
+		self.sub = sub
 		self.firstname = firstname
 		self.lastname = lastname
 	}
@@ -30,7 +30,7 @@ extension User: PostgreSQLMigration {
         return PostgreSQLDatabase.create(self, on: connection) { builder in
             try addProperties(to: builder)
 
-            builder.unique(on: \.email)
+            builder.unique(on: \.sub)
         }
     }
 }
