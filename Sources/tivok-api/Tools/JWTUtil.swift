@@ -36,8 +36,6 @@ public class JWTUtil {
 		if(rem != 0) {
 			let mustLength = encodedLength + dividableLength - rem
 		
-			print("\(mustLength)\n")
-		
 			encoded = encoded.padding(toLength: mustLength, withPad: "=", startingAt: 0)
 		}
 		
