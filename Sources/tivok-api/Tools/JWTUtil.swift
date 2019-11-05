@@ -12,7 +12,7 @@ public class JWTUtil {
 	public func verify(_ token: String) throws -> String {
 		let payload = try JSONDecoder().decode(
 			Auth0Payload.self,
-			from: decodeBase64(token.components(separatedBy: ".")[1], encoding: .ascii)
+			from: decodeBase64URL(token.components(separatedBy: ".")[1], encoding: .ascii)
 		)
 		
 		let openIDConfiguration = try decodeJSONFromURL(payload.iss+".well-known/openid-configuration", to: OpenIDConfiguration.self)
@@ -24,14 +24,28 @@ public class JWTUtil {
 		return jwt.payload.sub
 	}
 	
-	private func decodeBase64(_ encoded: String, encoding: String.Encoding) throws -> String {
+	// Error often thrown here, suuuper unreliable method
+	private func decodeBase64URL(_ encoded: String, encoding: String.Encoding) throws -> String {
 		var encoded = encoded
+		
+		// bring to right length
 		let dividableLength = 4
 		let encodedLength = encoded.count
-		let mustLength = encodedLength + dividableLength - (encodedLength % dividableLength)
+		let rem = (encodedLength % dividableLength)
 		
-		encoded = encoded.padding(toLength: mustLength, withPad: "=", startingAt: 0)
+		if(rem != 0) {
+			let mustLength = encodedLength + dividableLength - rem
 		
+			print("\(mustLength)\n")
+		
+			encoded = encoded.padding(toLength: mustLength, withPad: "=", startingAt: 0)
+		}
+		
+		// Change Encoding from base64URL to base64
+		encoded = encoded.replacingOccurrences(of: "-", with: "+")
+		encoded = encoded.replacingOccurrences(of: "_", with: "/")
+		
+		// Actually decode
 		guard let decodedData = Data(base64Encoded: encoded),
 			let decoded = String(data: decodedData, encoding: encoding) else {
 			throw DecodingError(message: "Could not decode Base64")
@@ -56,7 +70,7 @@ public class JWTUtil {
 		let jwks_uri: URL
 	}
 
-	private struct Auth0Payload: JWTPayload {
+	private struct Auth0Payload: JWTPayload { // also request family_name, given_name, and email claims here
 		let iss: String;
 		let sub: String;
 		let aud: String;
