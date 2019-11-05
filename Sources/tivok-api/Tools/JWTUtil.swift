@@ -15,6 +15,7 @@ public class JWTUtil {
 			from: decodeBase64URL(token.components(separatedBy: ".")[1], encoding: .ascii)
 		)
 		
+		// TODO: Check for right tenant instead of just using issuer..anyone could issue tokens that way
 		let openIDConfiguration = try decodeJSONFromURL(payload.iss+".well-known/openid-configuration", to: OpenIDConfiguration.self)
 		
 		let jwks = try decodeJSONFromURL(openIDConfiguration.jwks_uri, to: JWKS.self)

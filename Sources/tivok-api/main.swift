@@ -1,5 +1,6 @@
 import Vapor
 import FluentPostgreSQL
+import Authentication
 
 // Application configuration
 private func app(_ env: Environment) throws -> Application {
@@ -27,6 +28,9 @@ private func app(_ env: Environment) throws -> Application {
 	var migrations = MigrationConfig()
 	migrations.add(model: User.self, database: .psql)
 	services.register(migrations)
+	
+	// Register Authentication Provider
+	try services.register(AuthenticationProvider())
 	
 	return try Application(config: config, environment: env, services: services)
 }

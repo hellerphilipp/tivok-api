@@ -7,14 +7,15 @@
 
 import Vapor
 import FluentPostgreSQL
+import Authentication
 
 final class User: Content {
 	var id: UUID?
 	var sub: String
-	var firstname: String
-	var lastname: String
+	var firstname: String?
+	var lastname: String?
 	
-	init(id: UUID? = nil, sub: String, firstname: String, lastname: String) {
+	init(id: UUID? = nil, sub: String, firstname: String? = nil, lastname: String? = nil) {
 		self.id = id
 		self.sub = sub
 		self.firstname = firstname
@@ -36,3 +37,5 @@ extension User: PostgreSQLMigration {
 }
 
 extension User: Parameter {}
+
+extension User: Authenticatable {}
