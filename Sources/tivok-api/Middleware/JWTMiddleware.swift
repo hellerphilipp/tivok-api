@@ -26,10 +26,10 @@ struct JWTMiddleware: Middleware {
 				 return User(
 					sub: payload.sub,
 					email: payload.email,
-					emailVerified: payload.email_verified,
-					givenName: payload.given_name,
-					familyName: payload.family_name,
-					pictureURL: URL(string: payload.picture ?? "")
+					emailVerified: payload.emailVerified,
+					givenName: payload.givenName,
+					familyName: payload.familyName,
+					pictureURL: payload.pictureURL
 				).save(on: req).flatMap { user in
 					try req.authenticate(user)
 					return try next.respond(to: req)

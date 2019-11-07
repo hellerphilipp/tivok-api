@@ -9,7 +9,17 @@ import Vapor
 import FluentPostgreSQL
 import Authentication
 
-final class User: Content {
+protocol UserData: Decodable {
+	var id: UUID? { get set }
+	var sub: String { get set }
+	var email: String { get set }
+	var emailVerified: Bool { get set }
+	var givenName: String { get set }
+	var familyName: String { get set }
+	var pictureURL: URL? { get set }
+}
+
+final class User: UserData {
 	var id: UUID?
 	var sub: String
 	var email: String
@@ -18,14 +28,7 @@ final class User: Content {
 	var familyName: String
 	var pictureURL: URL?
 	
-	init(id: UUID? = nil,
-		 sub: String,
-		 email: String,
-		 emailVerified: Bool = false,
-		 givenName: String,
-		 familyName: String,
-		 pictureURL: URL?
-	) {
+	init(id: UUID? = nil, sub: String, email: String, emailVerified: Bool, givenName: String, familyName: String, pictureURL: URL?) {
 		self.id = id
 		self.sub = sub
 		self.email = email
@@ -35,6 +38,8 @@ final class User: Content {
 		self.pictureURL = pictureURL
 	}
 }
+
+extension User: Content {}
 
 extension User: PostgreSQLUUIDModel {}
 

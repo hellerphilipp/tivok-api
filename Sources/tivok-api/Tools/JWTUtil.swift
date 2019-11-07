@@ -7,10 +7,12 @@
 
 import JWT
 
-public class JWTUtil {
+class JWTUtil {
+	private let jsonDecoder = JSONDecoder()
+	
 	/// Verifies JWK-signed OpenID compliant JWTs
-	public func verify(_ token: String) throws -> Auth0Payload {
-		let payload = try JSONDecoder().decode(
+	func verify(_ token: String) throws -> Auth0Payload {
+		let payload = try jsonDecoder.decode(
 			Auth0Payload.self,
 			from: decodeBase64URL(token.components(separatedBy: ".")[1], encoding: .ascii)
 		)
@@ -20,7 +22,7 @@ public class JWTUtil {
 		
 		let jwks = try decodeJSONFromURL(openIDConfiguration.jwks_uri, to: JWKS.self)
 		
-		let jwt = try JWT<Auth0Payload>(from: token, verifiedUsing: .init(jwks: jwks))
+		let jwt = try JWT<Auth0Payload>(from: token, verifiedUsing: .init(jwks: jwks)) // fails because it cannot access strategy
 		
 		return jwt.payload
 	}
@@ -62,25 +64,42 @@ public class JWTUtil {
 	
 	private func decodeJSONFromURL<D: Decodable>(_ url: URL, to type: D.Type) throws -> D {
 		let jsonString = try String(contentsOf: url)
-		return try JSONDecoder().decode(D.self, from: jsonString)
+		return try jsonDecoder.decode(D.self, from: jsonString)
 	}
 	
 	private struct OpenIDConfiguration: Decodable {
 		let jwks_uri: URL
 	}
 
-	public struct Auth0Payload: JWTPayload { // also request family_name, given_name, and email claims here
+	struct Auth0Payload: UserData, JWTPayload {
+		var id: UUID?
+		var sub: String
+		var email: String
+		var emailVerified: Bool
+		var givenName: String
+		var familyName: String
+		var pictureURL: URL?
+		
 		let iss: String;
-		let sub: String;
 		let aud: String;
 		let iat: TimeInterval;
 		let exp: TimeInterval;
 		let nonce: String;
-		let given_name: String;
-		let family_name: String;
-		let email: String;
-		let email_verified: Bool;
-		let picture: String?;
+		
+		enum CodingKeys: String, CodingKey {
+			case sub
+			case email
+			case emailVerified = "email_verified"
+			case givenName = "given_name"
+			case familyName = "family_name"
+			case pictureURL = "picture"
+			
+			case iss
+			case aud
+			case iat
+			case exp
+			case nonce
+		}
 		
 		public func verify(using signer: JWTSigner) throws {
 			if(self.iat > Date().timeIntervalSince1970) {
