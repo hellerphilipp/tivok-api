@@ -22,12 +22,11 @@ class JWTUtil {
 		
 		let jwks = try decodeJSONFromURL(openIDConfiguration.jwks_uri, to: JWKS.self)
 		
-		let jwt = try JWT<Auth0Payload>(from: token, verifiedUsing: .init(jwks: jwks)) // fails because it cannot access strategy
+		let jwt = try JWT<Auth0Payload>(from: token, verifiedUsing: .init(jwks: jwks))
 		
 		return jwt.payload
 	}
 	
-	// Error often thrown here, suuuper unreliable method
 	private func decodeBase64URL(_ encoded: String, encoding: String.Encoding) throws -> String {
 		var encoded = encoded
 		
