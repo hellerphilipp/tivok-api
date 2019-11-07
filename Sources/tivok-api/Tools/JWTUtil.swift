@@ -9,7 +9,7 @@ import JWT
 
 public class JWTUtil {
 	/// Verifies JWK-signed OpenID compliant JWTs
-	public func verify(_ token: String) throws -> String {
+	public func verify(_ token: String) throws -> Auth0Payload {
 		let payload = try JSONDecoder().decode(
 			Auth0Payload.self,
 			from: decodeBase64URL(token.components(separatedBy: ".")[1], encoding: .ascii)
@@ -22,7 +22,7 @@ public class JWTUtil {
 		
 		let jwt = try JWT<Auth0Payload>(from: token, verifiedUsing: .init(jwks: jwks))
 		
-		return jwt.payload.sub
+		return jwt.payload
 	}
 	
 	// Error often thrown here, suuuper unreliable method
@@ -69,15 +69,20 @@ public class JWTUtil {
 		let jwks_uri: URL
 	}
 
-	private struct Auth0Payload: JWTPayload { // also request family_name, given_name, and email claims here
+	public struct Auth0Payload: JWTPayload { // also request family_name, given_name, and email claims here
 		let iss: String;
 		let sub: String;
 		let aud: String;
 		let iat: TimeInterval;
 		let exp: TimeInterval;
 		let nonce: String;
+		let given_name: String;
+		let family_name: String;
+		let email: String;
+		let email_verified: Bool;
+		let picture: String?;
 		
-		func verify(using signer: JWTSigner) throws {
+		public func verify(using signer: JWTSigner) throws {
 			if(self.iat > Date().timeIntervalSince1970) {
 				throw JWTError(identifier: "invalidJWT", reason: "JWT issued in the future")
 			}

@@ -12,14 +12,27 @@ import Authentication
 final class User: Content {
 	var id: UUID?
 	var sub: String
-	var firstname: String?
-	var lastname: String?
+	var email: String
+	var emailVerified: Bool
+	var givenName: String
+	var familyName: String
+	var pictureURL: URL?
 	
-	init(id: UUID? = nil, sub: String, firstname: String? = nil, lastname: String? = nil) {
+	init(id: UUID? = nil,
+		 sub: String,
+		 email: String,
+		 emailVerified: Bool = false,
+		 givenName: String,
+		 familyName: String,
+		 pictureURL: URL?
+	) {
 		self.id = id
 		self.sub = sub
-		self.firstname = firstname
-		self.lastname = lastname
+		self.email = email
+		self.emailVerified = emailVerified
+		self.givenName = givenName
+		self.familyName = familyName
+		self.pictureURL = pictureURL
 	}
 }
 
@@ -32,6 +45,7 @@ extension User: PostgreSQLMigration {
             try addProperties(to: builder)
 
             builder.unique(on: \.sub)
+			builder.unique(on: \.email)
         }
     }
 }
