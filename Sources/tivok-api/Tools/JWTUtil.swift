@@ -11,9 +11,9 @@ class JWTUtil {
 	private let jsonDecoder = JSONDecoder()
 	
 	/// Verifies JWK-signed OpenID compliant JWTs
-	func verify(_ token: String) throws -> Auth0Payload {
+	func verify(_ token: String) throws -> User.TokenPayload {
 		let payload = try jsonDecoder.decode(
-			Auth0Payload.self,
+			User.TokenPayload.self,
 			from: decodeBase64URL(token.components(separatedBy: ".")[1], encoding: .ascii)
 		)
 		
@@ -22,7 +22,7 @@ class JWTUtil {
 		
 		let jwks = try decodeJSONFromURL(openIDConfiguration.jwks_uri, to: JWKS.self)
 		
-		let jwt = try JWT<Auth0Payload>(from: token, verifiedUsing: .init(jwks: jwks))
+		let jwt = try JWT<User.TokenPayload>(from: token, verifiedUsing: .init(jwks: jwks))
 		
 		return jwt.payload
 	}
@@ -68,47 +68,6 @@ class JWTUtil {
 	
 	private struct OpenIDConfiguration: Decodable {
 		let jwks_uri: URL
-	}
-
-	struct Auth0Payload: UserData, JWTPayload {
-		var id: UUID?
-		var sub: String
-		var email: String
-		var emailVerified: Bool
-		var givenName: String
-		var familyName: String
-		var pictureURL: URL?
-		
-		let iss: String;
-		let aud: String;
-		let iat: TimeInterval;
-		let exp: TimeInterval;
-		let nonce: String;
-		
-		enum CodingKeys: String, CodingKey {
-			case sub
-			case email
-			case emailVerified = "email_verified"
-			case givenName = "given_name"
-			case familyName = "family_name"
-			case pictureURL = "picture"
-			
-			case iss
-			case aud
-			case iat
-			case exp
-			case nonce
-		}
-		
-		public func verify(using signer: JWTSigner) throws {
-			if(self.iat > Date().timeIntervalSince1970) {
-				throw JWTError(identifier: "invalidJWT", reason: "JWT issued in the future")
-			}
-			
-			if(self.exp <= Date().timeIntervalSince1970) {
-				throw JWTError(identifier: "expired", reason: "JWT not valid anymore")
-			}
-		}
 	}
 	
 	private struct DecodingError: Error {

@@ -8,6 +8,7 @@
 import Vapor
 import FluentPostgreSQL
 import Authentication
+import JWT
 
 protocol UserData: Decodable {
 	var id: UUID? { get set }
@@ -58,3 +59,46 @@ extension User: PostgreSQLMigration {
 extension User: Parameter {}
 
 extension User: Authenticatable {}
+
+extension User {
+	public struct TokenPayload: UserData, JWTPayload {
+		var id: UUID?
+		var sub: String
+		var email: String
+		var emailVerified: Bool
+		var givenName: String
+		var familyName: String
+		var pictureURL: URL?
+		
+		let iss: String;
+		let aud: String;
+		let iat: TimeInterval;
+		let exp: TimeInterval;
+		let nonce: String;
+		
+		enum CodingKeys: String, CodingKey {
+			case sub
+			case email
+			case emailVerified = "email_verified"
+			case givenName = "given_name"
+			case familyName = "family_name"
+			case pictureURL = "picture"
+			
+			case iss
+			case aud
+			case iat
+			case exp
+			case nonce
+		}
+		
+		public func verify(using signer: JWTSigner) throws {
+			if(self.iat > Date().timeIntervalSince1970) {
+				throw JWTError(identifier: "invalidJWT", reason: "JWT issued in the future")
+			}
+			
+			if(self.exp <= Date().timeIntervalSince1970) {
+				throw JWTError(identifier: "expired", reason: "JWT not valid anymore")
+			}
+		}
+	}
+}
