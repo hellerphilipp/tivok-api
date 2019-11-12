@@ -7,7 +7,7 @@
 
 import JWT
 
-class JWTUtil {
+class JWTUtil { // TODO: let people initialize this passing a model (e.g. user) that implements the TokenDecodable protocol --> has a tokenpayload subclass
 	private let jsonDecoder = JSONDecoder()
 	
 	/// Verifies JWK-signed OpenID compliant JWTs
