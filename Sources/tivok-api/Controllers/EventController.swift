@@ -11,7 +11,7 @@ class EventController: RouteCollection {
 		let protected = router.grouped(JWTMiddleware()) // TODO: Make JWTMiddleware a service
 		protected.post("events", use: createEvent)
 		protected.get("events", use: getEvents)
-		protected.get("events", Event.parameter, use: getEvents)
+		protected.get("events", Event.parameter, use: getHandler)
 	}
 	
 	func createEvent(req: Request) throws -> Future<HTTPResponse> {
