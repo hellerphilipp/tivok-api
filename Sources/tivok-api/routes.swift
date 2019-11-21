@@ -10,4 +10,7 @@ import Vapor
 func routes(_ router: Router) throws {
 	let userRoutes = UserController()
 	try router.register(collection: userRoutes)
+	
+	let eventRoutes = EventController()
+	try router.register(collection: eventRoutes)
 }

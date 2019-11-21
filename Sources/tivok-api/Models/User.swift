@@ -28,8 +28,9 @@ final class User: UserData {
 	var givenName: String
 	var familyName: String
 	var pictureURL: URL?
+	var lastEvent: Event.ID?
 	
-	init(id: UUID? = nil, sub: String, email: String, emailVerified: Bool, givenName: String, familyName: String, pictureURL: URL?) {
+	init(id: UUID? = nil, sub: String, email: String, emailVerified: Bool, givenName: String, familyName: String, pictureURL: URL?, lastEvent: Event.ID? = nil) {
 		self.id = id
 		self.sub = sub
 		self.email = email
@@ -37,6 +38,7 @@ final class User: UserData {
 		self.givenName = givenName
 		self.familyName = familyName
 		self.pictureURL = pictureURL
+		self.lastEvent = lastEvent
 	}
 }
 
@@ -100,5 +102,11 @@ extension User {
 				throw JWTError(identifier: "expired", reason: "JWT not valid anymore")
 			}
 		}
+	}
+}
+
+extension User {
+	var events: Children<User, Event> {
+		return children(\.ownerID)
 	}
 }

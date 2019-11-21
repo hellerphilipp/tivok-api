@@ -27,6 +27,7 @@ private func app(_ env: Environment) throws -> Application {
 	// Register database migrations
 	var migrations = MigrationConfig()
 	migrations.add(model: User.self, database: .psql)
+	migrations.add(model: Event.self, database: .psql)
 	services.register(migrations)
 	
 	// Register Authentication Provider
