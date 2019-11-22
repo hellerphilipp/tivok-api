@@ -28,6 +28,8 @@ class EventController: RouteCollection {
 		}
 	}
 	
+	// FIXME: return all events here, and have extra ?filter for user w/ permissions
+	// or should this only return events where user has read access anyway?
 	func getEvents(req: Request) throws -> Future<[Event]> {
 		let user = try req.requireAuthenticated(User.self)
 		
