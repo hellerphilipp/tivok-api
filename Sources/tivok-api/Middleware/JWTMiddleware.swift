@@ -11,7 +11,7 @@ import FluentPostgreSQL
 struct JWTMiddleware: Middleware {
 	func respond(to req: Request, chainingTo next: Responder) throws -> Future<Response> {
 		guard let token = req.http.headers.bearerAuthorization?.token,
-			let payload = try? JWTUtil().verify(token) else {
+			let payload = try? req.make(JWTUtil.self).verify(token) else {
 			throw Abort(.unauthorized)
 		}
 

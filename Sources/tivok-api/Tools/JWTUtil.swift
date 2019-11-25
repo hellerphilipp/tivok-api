@@ -6,29 +6,30 @@
 //
 
 import JWT
+import Vapor
 
 class JWTUtil { // TODO: let people initialize this passing a model (e.g. user) that implements the TokenDecodable protocol --> has a tokenpayload subclass
-	private let jsonDecoder = JSONDecoder()
+	private let jwks: JWKS
+	private static let jsonDecoder: JSONDecoder = JSONDecoder ()
+	
+	init(for tenant: String) throws {
+		struct OpenIDConfiguration: Decodable {
+			let jwks_uri: URL
+		}
+		
+		let openIDConfiguration = try JWTUtil.decodeJSONFromURL(tenant+".well-known/openid-configuration", to: OpenIDConfiguration.self)
+		
+		self.jwks = try JWTUtil.decodeJSONFromURL(openIDConfiguration.jwks_uri, to: JWKS.self)
+	}
 	
 	/// Verifies JWK-signed OpenID compliant JWTs
 	func verify(_ token: String) throws -> User.TokenPayload {
-		let payload = try jsonDecoder.decode(
-			User.TokenPayload.self,
-			from: decodeBase64URL(token.components(separatedBy: ".")[1], encoding: .ascii)
-		)
-		
-		// TODO: Check for right tenant instead of just using issuer..anyone could issue tokens that way
-		// TODO: load JWKs on App boot, saving time for individual requests [combine with making it a service --> instance var]
-		let openIDConfiguration = try decodeJSONFromURL(payload.iss+".well-known/openid-configuration", to: OpenIDConfiguration.self)
-		
-		let jwks = try decodeJSONFromURL(openIDConfiguration.jwks_uri, to: JWKS.self)
-		
 		let jwt = try JWT<User.TokenPayload>(from: token, verifiedUsing: .init(jwks: jwks))
 		
 		return jwt.payload
 	}
 	
-	private func decodeBase64URL(_ encoded: String, encoding: String.Encoding) throws -> String {
+	private static func decodeBase64URL(_ encoded: String, encoding: String.Encoding) throws -> String {
 		var encoded = encoded
 		
 		// bring to right length
@@ -54,7 +55,7 @@ class JWTUtil { // TODO: let people initialize this passing a model (e.g. user) 
 		return decoded
 	}
 	
-	private func decodeJSONFromURL<D: Decodable>(_ url: String, to type: D.Type) throws -> D {
+	private static func decodeJSONFromURL<D: Decodable>(_ url: String, to type: D.Type) throws -> D {
 		guard let url = URL(string: url) else {
 			throw URLError(URLError.badURL)
 		}
@@ -62,16 +63,14 @@ class JWTUtil { // TODO: let people initialize this passing a model (e.g. user) 
 		return try decodeJSONFromURL(url, to: D.self)
 	}
 	
-	private func decodeJSONFromURL<D: Decodable>(_ url: URL, to type: D.Type) throws -> D {
+	private static func decodeJSONFromURL<D: Decodable>(_ url: URL, to type: D.Type) throws -> D {
 		let jsonString = try String(contentsOf: url)
 		return try jsonDecoder.decode(D.self, from: jsonString)
-	}
-	
-	private struct OpenIDConfiguration: Decodable {
-		let jwks_uri: URL
 	}
 	
 	private struct DecodingError: Error {
 		let message: String
 	}
 }
+
+extension JWTUtil: Service {}

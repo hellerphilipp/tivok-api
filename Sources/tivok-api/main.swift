@@ -45,6 +45,9 @@ private func app(_ env: Environment) throws -> Application {
 	// Register Authentication Provider
 	try services.register(AuthenticationProvider())
 	
+	// Register JWTUtil to pre-load JWKs
+	try services.register(JWTUtil(for: try EnvLoader.get("JWT_TENANT")))
+	
 	return try Application(config: config, environment: env, services: services)
 }
 
