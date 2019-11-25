@@ -18,6 +18,7 @@ class JWTUtil { // TODO: let people initialize this passing a model (e.g. user) 
 		)
 		
 		// TODO: Check for right tenant instead of just using issuer..anyone could issue tokens that way
+		// TODO: load JWKs on App boot, saving time for individual requests
 		let openIDConfiguration = try decodeJSONFromURL(payload.iss+".well-known/openid-configuration", to: OpenIDConfiguration.self)
 		
 		let jwks = try decodeJSONFromURL(openIDConfiguration.jwks_uri, to: JWKS.self)
