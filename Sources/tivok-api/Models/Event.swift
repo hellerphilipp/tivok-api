@@ -10,8 +10,8 @@ import FluentPostgreSQL
 final class Event: Content {
 	var id: UUID?
 	var name: String
-	var startDate: TimeInterval?
-	var endDate: TimeInterval?
+	var startDate: Date?
+	var endDate: Date?
 	var location: String?
 	var description: String?
 	let ownerID: User.ID
@@ -20,8 +20,8 @@ final class Event: Content {
 	init(id: UUID? = nil,
 		 owner: User,
 		 name: String,
-		 startDate: TimeInterval? = nil,
-		 endDate: TimeInterval? = nil,
+		 startDate: Date? = nil,
+		 endDate: Date? = nil,
 		 location: String? = nil,
 		 description: String? = nil,
 		 published: Bool = false
