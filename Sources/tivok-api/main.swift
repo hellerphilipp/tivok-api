@@ -8,16 +8,18 @@ private func app(_ env: Environment) throws -> Application {
 	let env = env
 	var services = Services.default()
 	
-	// FIXME: move to nginx
 	var middlewares = MiddlewareConfig()
-	let corsConfiguration = CORSMiddleware.Configuration(
-		allowedOrigin: .all,
-		allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
-		allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin]
-	)
-	let corsMiddleware = CORSMiddleware(configuration: corsConfiguration)
-	middlewares.use(corsMiddleware)
-	middlewares.use(ErrorMiddleware.self)
+	
+	if(env != .production) {
+		let corsConfiguration = CORSMiddleware.Configuration(
+			allowedOrigin: .all,
+			allowedMethods: [.GET, .POST, .PUT, .OPTIONS, .DELETE, .PATCH],
+			allowedHeaders: [.accept, .authorization, .contentType, .origin, .xRequestedWith, .userAgent, .accessControlAllowOrigin]
+		)
+		let corsMiddleware = CORSMiddleware(configuration: corsConfiguration)
+		middlewares.use(corsMiddleware)
+		middlewares.use(ErrorMiddleware.self)
+	}
 	services.register(middlewares)
 	
 	// Router configuration
