@@ -18,8 +18,8 @@ private func app(_ env: Environment) throws -> Application {
 		)
 		let corsMiddleware = CORSMiddleware(configuration: corsConfiguration)
 		middlewares.use(corsMiddleware)
-		middlewares.use(ErrorMiddleware.self)
 	}
+	middlewares.use(ErrorMiddleware.self)
 	services.register(middlewares)
 	
 	// Router configuration
