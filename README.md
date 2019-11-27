@@ -6,7 +6,7 @@ The API monolith for the Tivok event-management platform.
 
 ## Prerequisites
 
-Docker is required to build the project for use with [tivok-compose](https://github.com/hellerphilipp/tivok-compose). Also, node.js and npm need to be installed on the system.
+Docker is required to build the project for use with [tivok-compose](https://github.com/hellerphilipp/tivok-compose).
 
 
 
